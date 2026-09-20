@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/bookings/presentation/screens/bookings_screen.dart';
+import '../../features/bookings/presentation/screens/session_detail_screen.dart';
 import '../../features/home/presentation/home_shell.dart';
 import '../widgets/page_scaffold.dart';
 
@@ -50,7 +52,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRoutes.bookings,
-                builder: (context, state) => const _Placeholder('Bookings'),
+                builder: (context, state) => BookingsScreen(
+                  initialTab: state.uri.queryParameters['tab'],
+                ),
               ),
             ],
           ),
@@ -74,7 +78,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '${AppRoutes.session}/:id',
-        builder: (context, state) => const _Placeholder('Session'),
+        builder: (context, state) =>
+            SessionDetailScreen(sessionId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '${AppRoutes.patient}/:id',

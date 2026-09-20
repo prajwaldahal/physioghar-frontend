@@ -26,3 +26,4 @@ flutter:
   generate: true
   assets:
     - assets/google_fonts/
+    - assets/mock/
