@@ -171,6 +171,22 @@ final sessionByIdProvider = Provider.family<BookingSession?, String>((ref, id) {
   return match.isEmpty ? null : match.first;
 });
 
+// The schedule feature narrows this to genuinely open slots once slots exist.
+final rescheduleOptionsProvider = Provider.family<List<DateTime>, DateTime>((
+  ref,
+  date,
+) {
+  final sessions = ref.watch(bookingsProvider).value ?? const [];
+  final taken = sessions
+      .where((s) => s.holdsSlot)
+      .map((s) => s.startsAt)
+      .toSet();
+  return [
+    for (var hour = 9; hour <= 17; hour++)
+      DateTime(date.year, date.month, date.day, hour),
+  ].where((slot) => !taken.contains(slot)).toList();
+});
+
 final sessionsForPatientProvider = Provider.family<List<BookingSession>, String>(
   (ref, patientId) {
     final sessions = ref.watch(bookingsProvider).value ?? const [];
