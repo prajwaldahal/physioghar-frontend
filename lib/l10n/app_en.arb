@@ -1,0 +1,64 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "PhysioGhar",
+
+  "navHome": "Home",
+  "navSchedule": "Schedule",
+  "navBookings": "Bookings",
+  "navPatients": "Patients",
+  "navAccount": "Account",
+
+  "greeting": "Namaste, {name}",
+  "@greeting": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+
+  "availabilityStatus": "Availability",
+  "available": "Available",
+  "unavailable": "Unavailable",
+
+  "todaysSchedule": "Today's schedule",
+  "upcomingSessions": "Upcoming sessions",
+  "todaysSessions": "Today's sessions",
+  "upcomingRequests": "Upcoming requests",
+  "completedSessions": "Completed sessions",
+
+  "noSessionsToday": "No sessions today",
+  "noSessionsTodayMessage": "Your day is clear. Enjoy the break.",
+  "noUpcomingSessions": "No upcoming sessions",
+  "noUpcomingSessionsMessage": "Accepted bookings will appear here.",
+  "noRequests": "No pending requests",
+  "noRequestsMessage": "New booking requests will show up here.",
+
+  "accountTitle": "Account",
+  "myProfile": "My profile",
+  "editProfile": "Edit profile",
+  "languageTitle": "Language",
+  "reportAnIssue": "Report an issue",
+  "myComplaints": "My complaints",
+  "logout": "Log out",
+
+  "profileName": "Full name",
+  "profileEmail": "Email",
+  "profilePhone": "Phone",
+  "profileExperience": "Experience",
+  "profileSpecialization": "Specialization",
+  "profileAddress": "Address",
+  "yearsExperience": "{years} years",
+  "@yearsExperience": {
+    "placeholders": {
+      "years": { "type": "int" }
+    }
+  },
+
+  "languageEnglish": "English",
+  "languageNepali": "Nepali",
+
+  "logoutConfirmTitle": "Log out?",
+  "logoutConfirmMessage": "This clears the local demo data and returns you to the dashboard.",
+  "cancel": "Cancel",
+  "save": "Save"
+}
