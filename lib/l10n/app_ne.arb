@@ -1,0 +1,54 @@
+{
+  "@@locale": "ne",
+
+  "appTitle": "फिजियोघर",
+
+  "navHome": "गृह",
+  "navSchedule": "तालिका",
+  "navBookings": "बुकिङ",
+  "navPatients": "बिरामी",
+  "navAccount": "खाता",
+
+  "greeting": "नमस्ते, {name}",
+
+  "availabilityStatus": "उपलब्धता",
+  "available": "उपलब्ध",
+  "unavailable": "अनुपलब्ध",
+
+  "todaysSchedule": "आजको तालिका",
+  "upcomingSessions": "आगामी सत्रहरू",
+  "todaysSessions": "आजका सत्रहरू",
+  "upcomingRequests": "आगामी अनुरोधहरू",
+  "completedSessions": "सम्पन्न सत्रहरू",
+
+  "noSessionsToday": "आज कुनै सत्र छैन",
+  "noSessionsTodayMessage": "आजको दिन खाली छ। आराम गर्नुहोस्।",
+  "noUpcomingSessions": "आगामी सत्र छैन",
+  "noUpcomingSessionsMessage": "स्वीकृत बुकिङहरू यहाँ देखिनेछन्।",
+  "noRequests": "कुनै अनुरोध छैन",
+  "noRequestsMessage": "नयाँ बुकिङ अनुरोधहरू यहाँ देखिनेछन्।",
+
+  "accountTitle": "खाता",
+  "myProfile": "मेरो प्रोफाइल",
+  "editProfile": "प्रोफाइल सम्पादन",
+  "languageTitle": "भाषा",
+  "reportAnIssue": "समस्या रिपोर्ट गर्नुहोस्",
+  "myComplaints": "मेरा उजुरीहरू",
+  "logout": "लगआउट",
+
+  "profileName": "पूरा नाम",
+  "profileEmail": "इमेल",
+  "profilePhone": "फोन",
+  "profileExperience": "अनुभव",
+  "profileSpecialization": "विशेषज्ञता",
+  "profileAddress": "ठेगाना",
+  "yearsExperience": "{years} वर्ष",
+
+  "languageEnglish": "अंग्रेजी",
+  "languageNepali": "नेपाली",
+
+  "logoutConfirmTitle": "लगआउट गर्ने?",
+  "logoutConfirmMessage": "यसले स्थानीय डेमो डाटा मेटाउँछ र तपाईंलाई ड्यासबोर्डमा फर्काउँछ।",
+  "cancel": "रद्द गर्नुहोस्",
+  "save": "सुरक्षित गर्नुहोस्"
+}
