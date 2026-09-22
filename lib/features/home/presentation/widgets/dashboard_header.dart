@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/format/app_date.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/eyebrow_label.dart';
@@ -62,11 +64,18 @@ class DashboardHeader extends ConsumerWidget {
                   ),
                   const SizedBox(width: AppSpacing.md),
                   if (name.isNotEmpty)
-                    UserAvatar(
-                      name: name,
-                      size: 48,
-                      background: Colors.white24,
-                      foreground: Colors.white,
+                    Material(
+                      type: MaterialType.transparency,
+                      child: InkWell(
+                        onTap: () => context.push(AppRoutes.myProfile),
+                        customBorder: const CircleBorder(),
+                        child: UserAvatar(
+                          name: name,
+                          size: 48,
+                          background: Colors.white24,
+                          foreground: Colors.white,
+                        ),
+                      ),
                     ),
                 ],
               ),
