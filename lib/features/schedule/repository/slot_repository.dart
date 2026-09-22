@@ -5,6 +5,9 @@ import '../../../core/models/availability_slot.dart';
 
 abstract class SlotRepository {
   Future<List<AvailabilitySlot>> fetchSlots();
+  Future<AvailabilitySlot> block(AvailabilitySlot slot);
+  Future<AvailabilitySlot> unblock(AvailabilitySlot slot);
+  Future<AvailabilitySlot> addSlot(DateTime startsAt);
 }
 
 class MockSlotRepository implements SlotRepository {
@@ -52,6 +55,21 @@ class MockSlotRepository implements SlotRepository {
     }
     return slots;
   }
+
+  @override
+  Future<AvailabilitySlot> block(AvailabilitySlot slot) async =>
+      slot.copyWith(availability: SlotAvailability.blocked);
+
+  @override
+  Future<AvailabilitySlot> unblock(AvailabilitySlot slot) async =>
+      slot.copyWith(availability: SlotAvailability.open);
+
+  @override
+  Future<AvailabilitySlot> addSlot(DateTime startsAt) async => AvailabilitySlot(
+    id: 'added-${startsAt.millisecondsSinceEpoch}',
+    startsAt: startsAt,
+    availability: SlotAvailability.open,
+  );
 }
 
 class RemoteSlotRepository implements SlotRepository {
@@ -64,4 +82,25 @@ class RemoteSlotRepository implements SlotRepository {
     final rows = await _api.getList('/api/v1/slots');
     return rows.map(AvailabilitySlot.fromApi).toList();
   }
+
+  @override
+  Future<AvailabilitySlot> block(AvailabilitySlot slot) async =>
+      AvailabilitySlot.fromApi(
+        await _api.postObject('/api/v1/slots/${slot.id}/block'),
+      );
+
+  @override
+  Future<AvailabilitySlot> unblock(AvailabilitySlot slot) async =>
+      AvailabilitySlot.fromApi(
+        await _api.postObject('/api/v1/slots/${slot.id}/unblock'),
+      );
+
+  @override
+  Future<AvailabilitySlot> addSlot(DateTime startsAt) async =>
+      AvailabilitySlot.fromApi(
+        await _api.postObject(
+          '/api/v1/slots',
+          body: {'startsAt': startsAt.toIso8601String()},
+        ),
+      );
 }

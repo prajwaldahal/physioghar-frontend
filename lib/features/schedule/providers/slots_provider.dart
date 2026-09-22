@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/data/api_client.dart';
 import '../../../core/data/data_providers.dart';
 import '../../../core/format/app_date.dart';
 import '../../../core/models/availability_slot.dart';
@@ -34,7 +35,7 @@ class SlotsNotifier extends AsyncNotifier<List<AvailabilitySlot>> {
     if (slot.isBlocked) {
       throw const ScheduleException('That slot is already blocked.');
     }
-    _replace(slot.copyWith(availability: SlotAvailability.blocked));
+    _replace(await _send((repo) => repo.block(slot)));
   }
 
   Future<void> unblock(String id) async {
@@ -42,25 +43,30 @@ class SlotsNotifier extends AsyncNotifier<List<AvailabilitySlot>> {
     if (!slot.isBlocked) {
       throw const ScheduleException('That slot is already open.');
     }
-    _replace(slot.copyWith(availability: SlotAvailability.open));
+    _replace(await _send((repo) => repo.unblock(slot)));
   }
 
   Future<void> addSlot(DateTime startsAt) async {
     final slots = _slots;
-    final clash = slots.where((s) => s.overlaps(startsAt));
-    if (clash.isNotEmpty) {
+    if (slots.any((s) => s.overlaps(startsAt))) {
       throw const ScheduleException(
         'That overlaps a slot you already have on this day.',
       );
     }
-    final added = AvailabilitySlot(
-      id: 'added-${startsAt.millisecondsSinceEpoch}',
-      startsAt: startsAt,
-      availability: SlotAvailability.open,
-    );
+    final added = await _send((repo) => repo.addSlot(startsAt));
     state = AsyncData(
       [...slots, added]..sort((a, b) => a.startsAt.compareTo(b.startsAt)),
     );
+  }
+
+  Future<AvailabilitySlot> _send(
+    Future<AvailabilitySlot> Function(SlotRepository) action,
+  ) async {
+    try {
+      return await action(ref.read(slotRepositoryProvider));
+    } on ApiException catch (e) {
+      throw ScheduleException(e.message);
+    }
   }
 
   void reset() => ref.invalidateSelf();

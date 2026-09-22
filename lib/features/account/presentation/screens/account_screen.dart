@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/data/api_client.dart';
+import '../../../../core/data/data_providers.dart';
 import '../../../../core/l10n/locale_provider.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -147,7 +149,19 @@ class AccountScreen extends ConsumerWidget {
     );
     if (!confirmed || !context.mounted) return;
 
-    // No real auth: logging out just puts the mock data back to its seed.
+    // No real auth: logging out just puts the data back to its seed. When the
+    // app is talking to the API, the server is reset first so the refetch is clean.
+    final api = ref.read(apiClientProvider);
+    if (api != null) {
+      try {
+        await api.post('/api/v1/reset');
+      } on ApiException catch (e) {
+        if (!context.mounted) return;
+        showErrorSnackBar(context, e.message);
+        return;
+      }
+    }
+
     ref.read(bookingsProvider.notifier).reset();
     ref.read(slotsProvider.notifier).reset();
     ref.read(profileProvider.notifier).reset();
