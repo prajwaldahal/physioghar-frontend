@@ -24,6 +24,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _controllers = <String, TextEditingController>{};
   bool _seeded = false;
+  bool _showAllErrors = false;
 
   @override
   void dispose() {
@@ -47,6 +48,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   void _save(TherapistProfile current) {
+    // onUserInteraction never reveals errors on fields the user skipped.
+    setState(() => _showAllErrors = true);
     if (!(_formKey.currentState?.validate() ?? false)) {
       showErrorSnackBar(context, 'Fix the highlighted fields and try again.');
       return;
@@ -86,7 +89,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       showBack: true,
       child: Form(
         key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
+        autovalidateMode: _showAllErrors
+            ? AutovalidateMode.always
+            : AutovalidateMode.onUserInteraction,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.pageGutter,
