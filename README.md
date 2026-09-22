@@ -1,4 +1,4 @@
-# PhysioGhar — Therapist App
+# PhysioGhar Therapist App
 
 A Flutter prototype of the PhysioGhar therapist app. It covers the daily dashboard, the weekly
 schedule and availability, booking requests and sessions, patient records with session notes,
@@ -164,7 +164,7 @@ Two things were done on purpose:
 - **Slots are built from a per-weekday pattern** rather than fixed dates, so the week always looks
   realistic: a blocked lunch hour each day, shorter weekends.
 
-Loading waits 300–600 ms on purpose, so the loading states are real rather than decoration. Actions
+Loading waits 300 to 600 ms on purpose, so the loading states are real rather than decoration. Actions
 the therapist takes apply immediately and confirm with a message.
 
 ## Important decisions
