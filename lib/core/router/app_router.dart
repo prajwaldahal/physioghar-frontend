@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/bookings/presentation/screens/bookings_screen.dart';
 import '../../features/bookings/presentation/screens/session_detail_screen.dart';
 import '../../features/home/presentation/home_shell.dart';
+import '../../features/schedule/presentation/screens/schedule_screen.dart';
 import '../widgets/page_scaffold.dart';
 
 class AppRoutes {
@@ -25,7 +26,7 @@ class AppRoutes {
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  return GoRouter(
+  final router = GoRouter(
     initialLocation: AppRoutes.dashboard,
     routes: [
       StatefulShellRoute.indexedStack(
@@ -44,7 +45,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRoutes.schedule,
-                builder: (context, state) => const _Placeholder('Schedule'),
+                builder: (context, state) => const ScheduleScreen(),
               ),
             ],
           ),
@@ -87,6 +88,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+  ref.onDispose(router.dispose);
+  return router;
 });
 
 class _Placeholder extends StatelessWidget {
