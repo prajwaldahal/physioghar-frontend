@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/account/presentation/screens/account_screen.dart';
+import '../../features/account/presentation/screens/edit_profile_screen.dart';
+import '../../features/account/presentation/screens/language_screen.dart';
+import '../../features/account/presentation/screens/my_profile_screen.dart';
 import '../../features/bookings/presentation/screens/bookings_screen.dart';
 import '../../features/bookings/presentation/screens/session_detail_screen.dart';
 import '../../features/home/presentation/home_shell.dart';
@@ -16,6 +20,10 @@ class AppRoutes {
   static const bookings = '/bookings';
   static const patients = '/patients';
   static const account = '/account';
+
+  static const myProfile = '/account/profile';
+  static const editProfile = '/account/edit';
+  static const language = '/account/language';
 
   static const session = '/session';
   static const patient = '/patient';
@@ -71,11 +79,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRoutes.account,
-                builder: (context, state) => const _Placeholder('Account'),
+                builder: (context, state) => const AccountScreen(),
               ),
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: AppRoutes.myProfile,
+        builder: (context, state) => const MyProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.language,
+        builder: (context, state) => const LanguageScreen(),
       ),
       GoRoute(
         path: '${AppRoutes.session}/:id',
