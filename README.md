@@ -31,8 +31,9 @@ instead of the mock files:
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
 ```
 
-`10.0.2.2` is how an Android emulator reaches the machine it runs on. The deployed copy works the
-same way:
+`10.0.2.2` is how an Android emulator reaches the machine it runs on. The value is the host on its
+own: the app puts `/api/v1` in front of every path itself, and trims that prefix back off if it is
+passed in as well. The deployed copy works the same way:
 
 ```bash
 flutter run --dart-define=API_BASE_URL=https://physioghar-backend.onrender.com
