@@ -55,6 +55,7 @@ class BookingSession {
     SessionStatus? status,
     DateTime? startsAt,
     String? remarks,
+    bool clearRemarks = false,
   }) {
     return BookingSession(
       id: id,
@@ -64,7 +65,7 @@ class BookingSession {
       location: location,
       startsAt: startsAt ?? this.startsAt,
       status: status ?? this.status,
-      remarks: remarks ?? this.remarks,
+      remarks: clearRemarks ? null : (remarks ?? this.remarks),
     );
   }
 
