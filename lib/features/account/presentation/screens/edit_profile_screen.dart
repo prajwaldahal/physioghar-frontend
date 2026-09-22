@@ -47,25 +47,34 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     });
   }
 
-  void _save(TherapistProfile current) {
+  Future<void> _save(TherapistProfile current) async {
     // onUserInteraction never reveals errors on fields the user skipped.
     setState(() => _showAllErrors = true);
     if (!(_formKey.currentState?.validate() ?? false)) {
       showErrorSnackBar(context, 'Fix the highlighted fields and try again.');
       return;
     }
-    ref
-        .read(profileProvider.notifier)
-        .save(
-          current.copyWith(
+    try {
+      await ref
+          .read(profileProvider.notifier)
+          .save(
+            current.copyWith(
             name: _controllers['name']!.text.trim(),
             email: _controllers['email']!.text.trim(),
             phone: _controllers['phone']!.text.trim(),
-            experienceYears: int.parse(_controllers['experience']!.text.trim()),
-            specialization: _controllers['specialization']!.text.trim(),
-            address: _controllers['address']!.text.trim(),
-          ),
-        );
+              experienceYears: int.parse(
+                _controllers['experience']!.text.trim(),
+              ),
+              specialization: _controllers['specialization']!.text.trim(),
+              address: _controllers['address']!.text.trim(),
+            ),
+          );
+    } on ProfileException catch (e) {
+      if (!mounted) return;
+      showErrorSnackBar(context, e.message);
+      return;
+    }
+    if (!mounted) return;
     Navigator.of(context).pop();
     showSuccessSnackBar(context, 'Profile updated.');
   }
