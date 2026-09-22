@@ -1,3 +1,4 @@
+import '../../../core/data/api_client.dart';
 import '../../../core/data/mock_data_source.dart';
 import '../model/complaint.dart';
 
@@ -14,5 +15,17 @@ class MockComplaintRepository implements ComplaintRepository {
   Future<List<Complaint>> fetchComplaints() async {
     final rows = await _source.loadList('complaints');
     return rows.map(Complaint.fromJson).toList();
+  }
+}
+
+class RemoteComplaintRepository implements ComplaintRepository {
+  const RemoteComplaintRepository(this._api);
+
+  final ApiClient _api;
+
+  @override
+  Future<List<Complaint>> fetchComplaints() async {
+    final rows = await _api.getList('/api/v1/complaints');
+    return rows.map(Complaint.fromApi).toList();
   }
 }
