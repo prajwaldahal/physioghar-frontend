@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/data/api_client.dart';
 import '../../../core/data/data_providers.dart';
 import '../../../core/format/app_date.dart';
 import '../../../core/models/booking_session.dart';
@@ -28,13 +29,15 @@ class BookingsNotifier extends AsyncNotifier<List<BookingSession>> {
     return ref.watch(bookingRepositoryProvider).fetchSessions();
   }
 
+  // The guards run here so the therapist gets an instant answer. When the app
+  // talks to the API the server checks the same rules again and wins.
   Future<void> accept(String id) async {
     final session = _require(id);
     if (session.status != SessionStatus.pending) {
       throw const BookingException('This request has already been handled.');
     }
     _guardSlotFree(session.startsAt, ignoreSessionId: session.id);
-    _replace(session.copyWith(status: SessionStatus.upcoming));
+    _replace(await _send((repo) => repo.accept(session)));
   }
 
   Future<void> decline(String id) async {
@@ -42,7 +45,7 @@ class BookingsNotifier extends AsyncNotifier<List<BookingSession>> {
     if (session.status != SessionStatus.pending) {
       throw const BookingException('This request has already been handled.');
     }
-    _replace(session.copyWith(status: SessionStatus.declined));
+    _replace(await _send((repo) => repo.decline(session)));
   }
 
   Future<void> complete(String id, {String? remarks}) async {
@@ -51,12 +54,8 @@ class BookingsNotifier extends AsyncNotifier<List<BookingSession>> {
       throw const BookingException('Only upcoming sessions can be completed.');
     }
     final trimmed = remarks?.trim();
-    _replace(
-      session.copyWith(
-        status: SessionStatus.completed,
-        remarks: (trimmed == null || trimmed.isEmpty) ? null : trimmed,
-      ),
-    );
+    final cleaned = (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+    _replace(await _send((repo) => repo.complete(session, cleaned)));
   }
 
   Future<void> reschedule(String id, DateTime startsAt) async {
@@ -70,7 +69,17 @@ class BookingsNotifier extends AsyncNotifier<List<BookingSession>> {
       );
     }
     _guardSlotFree(startsAt, ignoreSessionId: session.id);
-    _replace(session.copyWith(startsAt: startsAt));
+    _replace(await _send((repo) => repo.reschedule(session, startsAt)));
+  }
+
+  Future<BookingSession> _send(
+    Future<BookingSession> Function(BookingRepository) action,
+  ) async {
+    try {
+      return await action(ref.read(bookingRepositoryProvider));
+    } on ApiException catch (e) {
+      throw BookingException(e.message);
+    }
   }
 
   void reset() => ref.invalidateSelf();

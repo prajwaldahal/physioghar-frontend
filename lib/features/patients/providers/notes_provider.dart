@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/data/api_client.dart';
 import '../../../core/data/data_providers.dart';
 import '../model/session_note.dart';
 import '../repository/patient_repository.dart';
@@ -36,7 +37,7 @@ class NotesNotifier extends AsyncNotifier<List<SessionNote>> {
     if (trimmed.isEmpty) {
       throw const NoteException('A session note is required.');
     }
-    final created = SessionNote(
+    final draft = SessionNote(
       id: 'note-${DateTime.now().microsecondsSinceEpoch}',
       patientId: patientId,
       note: trimmed,
@@ -44,7 +45,8 @@ class NotesNotifier extends AsyncNotifier<List<SessionNote>> {
       nextSessionPlan: _optional(nextSessionPlan),
       createdAt: DateTime.now(),
     );
-    state = AsyncData([...(_notes), created]);
+    final created = await _send((repo) => repo.add(draft));
+    state = AsyncData([..._notes, created]);
   }
 
   Future<void> edit({
@@ -61,12 +63,13 @@ class NotesNotifier extends AsyncNotifier<List<SessionNote>> {
     if (existing.isEmpty) {
       throw const NoteException('That note no longer exists.');
     }
-    final updated = existing.first.copyWith(
+    final draft = existing.first.copyWith(
       note: trimmed,
       exercises: _clean(exercises),
       nextSessionPlan: _optional(nextSessionPlan),
       updatedAt: DateTime.now(),
     );
+    final updated = await _send((repo) => repo.edit(draft));
     state = AsyncData([
       for (final n in _notes)
         if (n.id == id) updated else n,
@@ -74,6 +77,16 @@ class NotesNotifier extends AsyncNotifier<List<SessionNote>> {
   }
 
   void reset() => ref.invalidateSelf();
+
+  Future<SessionNote> _send(
+    Future<SessionNote> Function(NotesRepository) action,
+  ) async {
+    try {
+      return await action(ref.read(notesRepositoryProvider));
+    } on ApiException catch (e) {
+      throw NoteException(e.message);
+    }
+  }
 
   List<String> _clean(List<String> values) => [
     for (final value in values)

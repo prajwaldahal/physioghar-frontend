@@ -2,9 +2,19 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/data/api_client.dart';
 import '../../../core/data/data_providers.dart';
 import '../model/complaint.dart';
 import '../repository/complaint_repository.dart';
+
+class ComplaintException implements Exception {
+  const ComplaintException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
 
 final complaintRepositoryProvider = Provider<ComplaintRepository>((ref) {
   final api = ref.watch(apiClientProvider);
@@ -29,10 +39,7 @@ class ComplaintsNotifier extends AsyncNotifier<List<Complaint>> {
     // Waiting on the initial load keeps a quick submit from failing.
     final current = await future;
 
-    // Stands in for the round trip an admin backend would make.
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-
-    final created = Complaint(
+    final draft = Complaint(
       id: 'complaint-${DateTime.now().microsecondsSinceEpoch}',
       reference: 'PG-${10000 + _random.nextInt(89999)}',
       category: category,
@@ -41,6 +48,13 @@ class ComplaintsNotifier extends AsyncNotifier<List<Complaint>> {
       status: ComplaintStatus.open,
       createdAt: DateTime.now(),
     );
+
+    final Complaint created;
+    try {
+      created = await ref.read(complaintRepositoryProvider).submit(draft);
+    } on ApiException catch (e) {
+      throw ComplaintException(e.message);
+    }
     state = AsyncData([created, ...current]);
     return created;
   }
