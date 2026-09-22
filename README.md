@@ -39,7 +39,9 @@ flutter run --dart-define=API_BASE_URL=https://physioghar-backend.onrender.com
 ```
 
 That instance sleeps when nobody is using it, so the first request after a quiet spell takes about
-half a minute to answer.
+half a minute to answer. A request that never made it out, and a read that arrives while the host
+is still starting, are tried again up to three times before the app gives up. An action the server
+has already answered is never sent twice, so nothing can be applied twice.
 
 In this mode every action is a real request, not only the first load. Accepting a booking, blocking
 a slot, saving the profile and writing a note all reach the server. The app still checks each rule
@@ -202,9 +204,9 @@ the therapist takes apply immediately and confirm with a message.
 
 - **Saving data.** Everything is in memory, so it resets on restart. A local database would fix
   that, and the repository layer is already the place to add it.
-- **Behaving well offline in API mode.** Reads and writes both go to the server now, but a failed
-  request only shows an error. Caching the last response and holding actions until the connection
-  comes back would be the next step, in the repository layer again.
+- **Working with no connection at all.** Failed requests are retried, but nothing is cached and
+  nothing is queued, so a flight-mode app can only show an error. Keeping the last response and
+  holding actions until the connection returns is the next step, in the repository layer again.
 - **More Nepali.** Only part of the app is translated. The rest of the text should move into the
   translation files, along with Nepali date formatting.
 - **Search and filters** on the patient list and the bookings tabs, which would matter well before a
