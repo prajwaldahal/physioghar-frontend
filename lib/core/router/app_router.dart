@@ -9,6 +9,7 @@ import '../../features/account/presentation/screens/my_profile_screen.dart';
 import '../../features/bookings/presentation/screens/bookings_screen.dart';
 import '../../features/bookings/presentation/screens/session_detail_screen.dart';
 import '../../features/home/presentation/home_shell.dart';
+import '../../features/home/presentation/screens/dashboard_screen.dart';
 import '../../features/schedule/presentation/screens/schedule_screen.dart';
 import '../widgets/page_scaffold.dart';
 
@@ -45,7 +46,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRoutes.dashboard,
-                builder: (context, state) => const _Placeholder('Home'),
+                builder: (context, state) => const DashboardScreen(),
               ),
             ],
           ),
