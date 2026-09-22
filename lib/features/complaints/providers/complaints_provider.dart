@@ -6,9 +6,12 @@ import '../../../core/data/data_providers.dart';
 import '../model/complaint.dart';
 import '../repository/complaint_repository.dart';
 
-final complaintRepositoryProvider = Provider<ComplaintRepository>(
-  (ref) => MockComplaintRepository(ref.watch(mockDataSourceProvider)),
-);
+final complaintRepositoryProvider = Provider<ComplaintRepository>((ref) {
+  final api = ref.watch(apiClientProvider);
+  return api == null
+      ? MockComplaintRepository(ref.watch(mockDataSourceProvider))
+      : RemoteComplaintRepository(api);
+});
 
 class ComplaintsNotifier extends AsyncNotifier<List<Complaint>> {
   static final _random = Random();

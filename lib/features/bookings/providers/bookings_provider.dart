@@ -15,9 +15,12 @@ class BookingException implements Exception {
   String toString() => message;
 }
 
-final bookingRepositoryProvider = Provider<BookingRepository>(
-  (ref) => MockBookingRepository(ref.watch(mockDataSourceProvider)),
-);
+final bookingRepositoryProvider = Provider<BookingRepository>((ref) {
+  final api = ref.watch(apiClientProvider);
+  return api == null
+      ? MockBookingRepository(ref.watch(mockDataSourceProvider))
+      : RemoteBookingRepository(api);
+});
 
 class BookingsNotifier extends AsyncNotifier<List<BookingSession>> {
   @override

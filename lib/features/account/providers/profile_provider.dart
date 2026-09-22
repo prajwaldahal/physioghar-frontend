@@ -4,9 +4,12 @@ import '../../../core/data/data_providers.dart';
 import '../../../core/models/therapist_profile.dart';
 import '../repository/profile_repository.dart';
 
-final profileRepositoryProvider = Provider<ProfileRepository>(
-  (ref) => MockProfileRepository(ref.watch(mockDataSourceProvider)),
-);
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
+  final api = ref.watch(apiClientProvider);
+  return api == null
+      ? MockProfileRepository(ref.watch(mockDataSourceProvider))
+      : RemoteProfileRepository(api);
+});
 
 class ProfileNotifier extends AsyncNotifier<TherapistProfile> {
   @override

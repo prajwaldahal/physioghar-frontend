@@ -14,9 +14,12 @@ class ScheduleException implements Exception {
   String toString() => message;
 }
 
-final slotRepositoryProvider = Provider<SlotRepository>(
-  (ref) => MockSlotRepository(ref.watch(mockDataSourceProvider)),
-);
+final slotRepositoryProvider = Provider<SlotRepository>((ref) {
+  final api = ref.watch(apiClientProvider);
+  return api == null
+      ? MockSlotRepository(ref.watch(mockDataSourceProvider))
+      : RemoteSlotRepository(api);
+});
 
 // Holds only what the therapist controls: open or blocked. Whether a slot is
 // booked is derived from sessions, never stored here.
