@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/data/data_providers.dart';
 import '../../../core/format/app_date.dart';
 import '../../../core/models/booking_session.dart';
+import '../../schedule/providers/slots_provider.dart';
 import '../repository/booking_repository.dart';
 
 class BookingException implements Exception {
@@ -71,7 +72,6 @@ class BookingsNotifier extends AsyncNotifier<List<BookingSession>> {
 
   void reset() => ref.invalidateSelf();
 
-  // Schedule rules layer on top of this in the schedule feature.
   void _guardSlotFree(DateTime startsAt, {required String ignoreSessionId}) {
     final clash = _sessions.any(
       (s) =>
@@ -82,6 +82,23 @@ class BookingsNotifier extends AsyncNotifier<List<BookingSession>> {
     if (clash) {
       throw const BookingException(
         'That time is already booked. Pick another slot.',
+      );
+    }
+
+    // Read rather than watch: the slot list must not become a build dependency,
+    // because the schedule derives its booked state from these sessions.
+    final slots = ref.read(slotsProvider).value;
+    if (slots == null) return;
+
+    final match = slots.where((s) => s.startsAt.isAtSameMomentAs(startsAt));
+    if (match.isEmpty) {
+      throw const BookingException(
+        'There is no slot at that time. Add one from the schedule first.',
+      );
+    }
+    if (match.first.isBlocked) {
+      throw const BookingException(
+        'That slot is blocked. Unblock it from the schedule or pick another time.',
       );
     }
   }
@@ -171,7 +188,7 @@ final sessionByIdProvider = Provider.family<BookingSession?, String>((ref, id) {
   return match.isEmpty ? null : match.first;
 });
 
-// The schedule feature narrows this to genuinely open slots once slots exist.
+// Only genuinely open slots: not blocked, and not already held by a session.
 final rescheduleOptionsProvider = Provider.family<List<DateTime>, DateTime>((
   ref,
   date,
@@ -181,10 +198,11 @@ final rescheduleOptionsProvider = Provider.family<List<DateTime>, DateTime>((
       .where((s) => s.holdsSlot)
       .map((s) => s.startsAt)
       .toSet();
-  return [
-    for (var hour = 9; hour <= 17; hour++)
-      DateTime(date.year, date.month, date.day, hour),
-  ].where((slot) => !taken.contains(slot)).toList();
+  return ref
+      .watch(slotsForDayProvider(date))
+      .where((slot) => !slot.isBlocked && !taken.contains(slot.startsAt))
+      .map((slot) => slot.startsAt)
+      .toList();
 });
 
 final sessionsForPatientProvider = Provider.family<List<BookingSession>, String>(
