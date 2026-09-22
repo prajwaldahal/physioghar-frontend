@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 class ApiException implements Exception {
   const ApiException(this.message);
@@ -12,10 +10,22 @@ class ApiException implements Exception {
 }
 
 class ApiClient {
-  const ApiClient(this.baseUrl, {this.client});
+  ApiClient(String baseUrl, {Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: baseUrl,
+              connectTimeout: _timeout,
+              receiveTimeout: _timeout,
+              sendTimeout: _timeout,
+              contentType: Headers.jsonContentType,
+              // Let non-2xx responses through so the reason can be read out.
+              validateStatus: (_) => true,
+            ),
+          );
 
-  final String baseUrl;
-  final http.Client? client;
+  final Dio _dio;
 
   static const _timeout = Duration(seconds: 10);
 
@@ -23,38 +33,65 @@ class ApiClient {
     String path, {
     Map<String, String>? query,
   }) async {
-    final decoded = await _get(path, query);
-    if (decoded is! List) {
+    final data = await _send('GET', path, query: query);
+    if (data is! List) {
       throw const ApiException('The server returned an unexpected response.');
     }
-    return decoded.cast<Map<String, dynamic>>();
+    return data.cast<Map<String, dynamic>>();
   }
 
-  Future<Map<String, dynamic>> getObject(String path) async {
-    final decoded = await _get(path, null);
-    if (decoded is! Map<String, dynamic>) {
-      throw const ApiException('The server returned an unexpected response.');
-    }
-    return decoded;
-  }
+  Future<Map<String, dynamic>> getObject(String path) async =>
+      _expectObject(await _send('GET', path));
 
-  Future<dynamic> _get(String path, Map<String, String>? query) async {
-    final uri = Uri.parse('$baseUrl$path').replace(queryParameters: query);
-    final sender = client ?? http.Client();
+  Future<Map<String, dynamic>> postObject(String path, {Object? body}) async =>
+      _expectObject(await _send('POST', path, body: body));
+
+  Future<Map<String, dynamic>> putObject(String path, {Object? body}) async =>
+      _expectObject(await _send('PUT', path, body: body));
+
+  Future<void> post(String path) => _send('POST', path);
+
+  Future<dynamic> _send(
+    String method,
+    String path, {
+    Object? body,
+    Map<String, String>? query,
+  }) async {
     try {
-      final response = await sender.get(uri).timeout(_timeout);
-      if (response.statusCode >= 400) {
-        throw ApiException(
-          'The server replied ${response.statusCode}. Please try again.',
-        );
-      }
-      return jsonDecode(response.body);
+      final response = await _dio.request<dynamic>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: Options(method: method),
+      );
+      final status = response.statusCode ?? 0;
+      if (status >= 400) throw ApiException(_reasonFrom(response, status));
+      return response.data;
     } on ApiException {
       rethrow;
-    } catch (_) {
-      throw const ApiException('Could not reach the server.');
-    } finally {
-      if (client == null) sender.close();
+    } on DioException catch (e) {
+      throw ApiException(
+        e.type == DioExceptionType.connectionError
+            ? 'Could not reach the server.'
+            : 'The request failed. Please try again.',
+      );
     }
+  }
+
+  Map<String, dynamic> _expectObject(dynamic data) {
+    if (data is! Map<String, dynamic>) {
+      if (data == null || (data is String && data.isEmpty)) return const {};
+      throw const ApiException('The server returned an unexpected response.');
+    }
+    return data;
+  }
+
+  // The API puts a readable reason in "detail" when it refuses an action.
+  String _reasonFrom(Response<dynamic> response, int status) {
+    final data = response.data;
+    if (data is Map && data['detail'] is String) {
+      return data['detail'] as String;
+    }
+    return 'The server replied $status. Please try again.';
   }
 }
