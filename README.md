@@ -40,10 +40,11 @@ passed in as well. The deployed copy works the same way:
 flutter run --dart-define=API_BASE_URL=https://physioghar-backend.onrender.com
 ```
 
-That instance sleeps when nobody is using it, so the first request after a quiet spell takes about
-half a minute to answer. A request that never made it out, and a read that arrives while the host
-is still starting, are tried again up to three times before the app gives up. An action the server
-has already answered is never sent twice, so nothing can be applied twice.
+A monitor pings that instance every few minutes, so it is normally awake and answers straight away.
+Render still stops a free instance that nothing has touched, and starting one again takes about half
+a minute. A request that never made it out, and a read that arrives while the host is still
+starting, are tried again up to three times before the app gives up. An action the server has
+already answered is never sent twice, so nothing can be applied twice.
 
 In this mode every action is a real request, not only the first load. Accepting a booking, blocking
 a slot, saving the profile and writing a note all reach the server. The app still checks each rule
