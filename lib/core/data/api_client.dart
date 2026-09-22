@@ -28,6 +28,8 @@ class ApiClient {
   final Dio _dio;
 
   static const _timeout = Duration(seconds: 10);
+  static const _maxAttempts = 3;
+  static const _retryGap = Duration(milliseconds: 600);
 
   Future<List<Map<String, dynamic>>> getList(
     String path, {
@@ -57,26 +59,52 @@ class ApiClient {
     Object? body,
     Map<String, String>? query,
   }) async {
-    try {
-      final response = await _dio.request<dynamic>(
-        path,
-        data: body,
-        queryParameters: query,
-        options: Options(method: method),
-      );
-      final status = response.statusCode ?? 0;
-      if (status >= 400) throw ApiException(_reasonFrom(response, status));
-      return response.data;
-    } on ApiException {
-      rethrow;
-    } on DioException catch (e) {
-      throw ApiException(
-        e.type == DioExceptionType.connectionError
-            ? 'Could not reach the server.'
-            : 'The request failed. Please try again.',
-      );
+    for (var attempt = 1; ; attempt++) {
+      final canRetry = attempt < _maxAttempts;
+      try {
+        final response = await _dio.request<dynamic>(
+          path,
+          data: body,
+          queryParameters: query,
+          options: Options(method: method),
+        );
+        final status = response.statusCode ?? 0;
+        if (canRetry && _worthAnotherGo(method, status)) {
+          await Future<void>.delayed(_retryGap * attempt);
+          continue;
+        }
+        if (status >= 400) throw ApiException(_reasonFrom(response, status));
+        return response.data;
+      } on DioException catch (e) {
+        if (canRetry && _neverLanded(method, e.type)) {
+          await Future<void>.delayed(_retryGap * attempt);
+          continue;
+        }
+        throw ApiException(
+          e.type == DioExceptionType.connectionError
+              ? 'Could not reach the server.'
+              : 'The request failed. Please try again.',
+        );
+      }
     }
   }
+
+  // Repeating a request is only safe when it cannot have been applied already.
+  // Nothing reached the server if the connection itself failed; a timeout while
+  // waiting for the reply says nothing either way, so only reads are repeated.
+  bool _neverLanded(String method, DioExceptionType type) {
+    if (type == DioExceptionType.connectionError ||
+        type == DioExceptionType.connectionTimeout) {
+      return true;
+    }
+    return method == 'GET' &&
+        (type == DioExceptionType.receiveTimeout ||
+            type == DioExceptionType.sendTimeout);
+  }
+
+  // A host that is still waking up answers 502 or 503 for a few seconds.
+  bool _worthAnotherGo(String method, int status) =>
+      method == 'GET' && (status == 502 || status == 503 || status == 504);
 
   Map<String, dynamic> _expectObject(dynamic data) {
     if (data is! Map<String, dynamic>) {
