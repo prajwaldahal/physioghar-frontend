@@ -68,6 +68,19 @@ class BookingSession {
     );
   }
 
+  factory BookingSession.fromApi(Map<String, dynamic> json) {
+    return BookingSession(
+      id: json['id'] as String,
+      patientId: json['patientId'] as String,
+      patientName: json['patientName'] as String,
+      treatment: json['treatment'] as String,
+      location: SessionLocation.values.byName(json['location'] as String),
+      startsAt: DateTime.parse(json['startsAt'] as String),
+      status: SessionStatus.values.byName(json['status'] as String),
+      remarks: json['remarks'] as String?,
+    );
+  }
+
   factory BookingSession.fromJson(Map<String, dynamic> json) {
     return BookingSession(
       id: json['id'] as String,
