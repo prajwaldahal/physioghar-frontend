@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,9 +8,10 @@ import '../../features/account/presentation/screens/my_profile_screen.dart';
 import '../../features/bookings/presentation/screens/bookings_screen.dart';
 import '../../features/bookings/presentation/screens/session_detail_screen.dart';
 import '../../features/home/presentation/home_shell.dart';
+import '../../features/patients/presentation/screens/patient_detail_screen.dart';
+import '../../features/patients/presentation/screens/patients_list_screen.dart';
 import '../../features/home/presentation/screens/dashboard_screen.dart';
 import '../../features/schedule/presentation/screens/schedule_screen.dart';
-import '../widgets/page_scaffold.dart';
 
 class AppRoutes {
   const AppRoutes._();
@@ -72,7 +72,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRoutes.patients,
-                builder: (context, state) => const _Placeholder('Patients'),
+                builder: (context, state) => const PatientsListScreen(),
               ),
             ],
           ),
@@ -105,21 +105,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '${AppRoutes.patient}/:id',
-        builder: (context, state) => const _Placeholder('Patient'),
+        builder: (context, state) =>
+            PatientDetailScreen(patientId: state.pathParameters['id']!),
       ),
     ],
   );
   ref.onDispose(router.dispose);
   return router;
 });
-
-class _Placeholder extends StatelessWidget {
-  const _Placeholder(this.title);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return PageScaffold(title: title, child: const SizedBox.shrink());
-  }
-}
