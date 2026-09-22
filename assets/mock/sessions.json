@@ -127,7 +127,7 @@
     "treatment": "Frozen Shoulder",
     "location": "clinic",
     "dayOffset": 1,
-    "time": "09:00",
+    "time": "11:00",
     "status": "pending",
     "remarks": null
   },
@@ -138,7 +138,7 @@
     "treatment": "Sports Injury (Ankle)",
     "location": "homeVisit",
     "dayOffset": 1,
-    "time": "11:00",
+    "time": "12:00",
     "status": "pending",
     "remarks": null
   },
@@ -160,7 +160,7 @@
     "treatment": "Cervical Spondylosis",
     "location": "clinic",
     "dayOffset": 1,
-    "time": "09:00",
+    "time": "11:00",
     "status": "pending",
     "remarks": null
   },
