@@ -30,6 +30,7 @@ class _NoteEditorSheetState extends ConsumerState<NoteEditorSheet> {
     text: widget.existing?.nextSessionPlan ?? '',
   );
   bool _busy = false;
+  bool _showAllErrors = false;
 
   @override
   void dispose() {
@@ -40,6 +41,8 @@ class _NoteEditorSheetState extends ConsumerState<NoteEditorSheet> {
   }
 
   Future<void> _submit() async {
+    // onUserInteraction never reveals errors on fields the user skipped.
+    setState(() => _showAllErrors = true);
     if (!(_formKey.currentState?.validate() ?? false)) {
       showErrorSnackBar(context, 'A session note is required.');
       return;
@@ -88,7 +91,9 @@ class _NoteEditorSheetState extends ConsumerState<NoteEditorSheet> {
       subtitle: 'Exercises go one per line.',
       child: Form(
         key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
+        autovalidateMode: _showAllErrors
+            ? AutovalidateMode.always
+            : AutovalidateMode.onUserInteraction,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

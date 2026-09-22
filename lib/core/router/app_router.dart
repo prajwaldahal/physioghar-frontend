@@ -6,6 +6,8 @@ import '../../features/account/presentation/screens/edit_profile_screen.dart';
 import '../../features/account/presentation/screens/language_screen.dart';
 import '../../features/account/presentation/screens/my_profile_screen.dart';
 import '../../features/bookings/presentation/screens/bookings_screen.dart';
+import '../../features/complaints/presentation/screens/my_complaints_screen.dart';
+import '../../features/complaints/presentation/screens/report_issue_screen.dart';
 import '../../features/bookings/presentation/screens/session_detail_screen.dart';
 import '../../features/home/presentation/home_shell.dart';
 import '../../features/patients/presentation/screens/patient_detail_screen.dart';
@@ -25,6 +27,8 @@ class AppRoutes {
   static const myProfile = '/account/profile';
   static const editProfile = '/account/edit';
   static const language = '/account/language';
+  static const reportIssue = '/account/report-issue';
+  static const myComplaints = '/account/complaints';
 
   static const session = '/session';
   static const patient = '/patient';
@@ -93,6 +97,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.editProfile,
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.reportIssue,
+        builder: (context, state) => const ReportIssueScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.myComplaints,
+        builder: (context, state) => const MyComplaintsScreen(),
       ),
       GoRoute(
         path: AppRoutes.language,
