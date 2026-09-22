@@ -4,7 +4,8 @@ A Flutter prototype of the PhysioGhar therapist app. It covers the daily dashboa
 schedule and availability, booking requests and sessions, patient records with session notes,
 profile and language settings, and reporting an issue.
 
-Android only. The data is mocked and kept in memory, so it resets when the app restarts.
+Android only. The data is mocked and kept in memory by default, so it resets when the app restarts.
+It can also run against the companion API, which is what the APK handed in with this project does.
 
 ## How to run
 
@@ -49,8 +50,16 @@ a slot, saving the profile and writing a note all reach the server. The app stil
 before it sends, so a refusal is immediate, and the server checks again and has the last word. When
 the server is the one to refuse, the reason it gives is the message the app shows.
 
-Without `API_BASE_URL` the app uses its mock data. That is the default, and it is what the shipped
-APK does.
+The same define builds the APK:
+
+```bash
+flutter build apk --release --dart-define=API_BASE_URL=https://physioghar-backend.onrender.com
+```
+
+Without `API_BASE_URL` the app uses its mock data. That is what a plain `flutter run` does, and it
+needs no server and no connection. The APK handed in is built with the define, so it reads and
+writes against the hosted API instead. Note that only `https` works in a release build: cleartext
+`http`, and so a local server on `10.0.2.2`, is allowed in debug builds alone.
 
 ## Versions
 
