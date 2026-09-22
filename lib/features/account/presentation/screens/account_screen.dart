@@ -12,6 +12,8 @@ import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../bookings/providers/bookings_provider.dart';
+import '../../../complaints/providers/complaints_provider.dart';
+import '../../../patients/providers/notes_provider.dart';
 import '../../../schedule/providers/schedule_provider.dart';
 import '../../../schedule/providers/slots_provider.dart';
 import '../../providers/profile_provider.dart';
@@ -93,6 +95,16 @@ class AccountScreen extends ConsumerWidget {
                         onTap: () => context.go(AppRoutes.schedule),
                       ),
                       AccountMenuTile(
+                        icon: Icons.report_gmailerrorred_outlined,
+                        label: l10n.reportAnIssue,
+                        onTap: () => context.push(AppRoutes.reportIssue),
+                      ),
+                      AccountMenuTile(
+                        icon: Icons.inbox_outlined,
+                        label: l10n.myComplaints,
+                        onTap: () => context.push(AppRoutes.myComplaints),
+                      ),
+                      AccountMenuTile(
                         icon: Icons.language_outlined,
                         label: l10n.languageTitle,
                         trailing: locale.languageCode == 'ne'
@@ -139,6 +151,8 @@ class AccountScreen extends ConsumerWidget {
     ref.read(bookingsProvider.notifier).reset();
     ref.read(slotsProvider.notifier).reset();
     ref.read(profileProvider.notifier).reset();
+    ref.read(notesProvider.notifier).reset();
+    ref.read(complaintsProvider.notifier).reset();
     ref.read(availabilityStatusProvider.notifier).setAvailable(true);
     ref.read(localeProvider.notifier).select('en');
 
