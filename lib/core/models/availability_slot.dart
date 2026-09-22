@@ -32,6 +32,16 @@ class AvailabilitySlot {
     return startsAt.isBefore(otherEnd) && otherStart.isBefore(endsAt);
   }
 
+  factory AvailabilitySlot.fromApi(Map<String, dynamic> json) {
+    return AvailabilitySlot(
+      id: json['id'] as String,
+      startsAt: DateTime.parse(json['startsAt'] as String),
+      availability: json['state'] == 'blocked'
+          ? SlotAvailability.blocked
+          : SlotAvailability.open,
+    );
+  }
+
   AvailabilitySlot copyWith({SlotAvailability? availability}) {
     return AvailabilitySlot(
       id: id,

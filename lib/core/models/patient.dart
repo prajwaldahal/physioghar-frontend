@@ -27,6 +27,8 @@ class Patient {
   final String condition;
   final List<String> treatmentHistory;
 
+  factory Patient.fromApi(Map<String, dynamic> json) => Patient.fromJson(json);
+
   factory Patient.fromJson(Map<String, dynamic> json) {
     return Patient(
       id: json['id'] as String,

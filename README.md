@@ -22,6 +22,28 @@ flutter build apk --release
 `flutter pub get` also regenerates the localisation classes from `lib/l10n/*.arb`, so no extra
 codegen step is needed.
 
+## Running against the API
+
+There is a companion FastAPI backend. The app reads from it when a base URL is supplied at build
+time, and falls back to its bundled mock data when one is not:
+
+```bash
+# Android emulator reaching a server on the host machine
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
+```
+
+With no `API_BASE_URL` the app runs entirely on mock data, exactly as before — that is the default
+and what the shipped APK does.
+
+The remote implementations sit behind the same repository interfaces as the mock ones, so nothing
+above the repository layer changes. Plain-http traffic is allowed in the debug manifest only; the
+release build does not permit it.
+
+**One limitation worth stating plainly:** the repository interfaces are read-only, so in API mode
+the app *reads* from the server but still applies changes in memory. Accepting a booking updates
+the app and not the server. Making writes round-trip would mean widening the repository interfaces
+with the mutating calls, which the API already exposes.
+
 ## Versions
 
 | | |
@@ -39,6 +61,7 @@ codegen step is needed.
 | `go_router` | Declarative routing with a `StatefulShellRoute` so each bottom-nav tab keeps its own navigation stack, and detail screens are deep-linkable. |
 | `google_fonts` | Loads Fraunces, Inter and IBM Plex Mono from bundled assets, per the design system in the brief. |
 | `intl` | Date and time formatting. |
+| `http` | Reads from the companion API when a base URL is supplied at build time. |
 | `flutter_localizations` | English and Nepali localisation. |
 
 No code generation is used — no `freezed`, no `riverpod_generator`, no `build_runner`. Models are

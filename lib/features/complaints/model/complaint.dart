@@ -46,6 +46,18 @@ class Complaint {
   final ComplaintStatus status;
   final DateTime createdAt;
 
+  factory Complaint.fromApi(Map<String, dynamic> json) {
+    return Complaint(
+      id: json['id'] as String,
+      reference: json['reference'] as String,
+      category: ComplaintCategory.values.byName(json['category'] as String),
+      subject: json['subject'] as String,
+      description: json['description'] as String,
+      status: ComplaintStatus.values.byName(json['status'] as String),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+    );
+  }
+
   factory Complaint.fromJson(Map<String, dynamic> json) {
     return Complaint(
       id: json['id'] as String,

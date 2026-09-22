@@ -6,9 +6,12 @@ import '../../../core/models/patient.dart';
 import '../../bookings/providers/bookings_provider.dart';
 import '../repository/patient_repository.dart';
 
-final patientRepositoryProvider = Provider<PatientRepository>(
-  (ref) => MockPatientRepository(ref.watch(mockDataSourceProvider)),
-);
+final patientRepositoryProvider = Provider<PatientRepository>((ref) {
+  final api = ref.watch(apiClientProvider);
+  return api == null
+      ? MockPatientRepository(ref.watch(mockDataSourceProvider))
+      : RemotePatientRepository(api);
+});
 
 class PatientsNotifier extends AsyncNotifier<List<Patient>> {
   @override

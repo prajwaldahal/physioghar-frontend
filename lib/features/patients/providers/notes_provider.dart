@@ -13,9 +13,12 @@ class NoteException implements Exception {
   String toString() => message;
 }
 
-final notesRepositoryProvider = Provider<NotesRepository>(
-  (ref) => MockNotesRepository(ref.watch(mockDataSourceProvider)),
-);
+final notesRepositoryProvider = Provider<NotesRepository>((ref) {
+  final api = ref.watch(apiClientProvider);
+  return api == null
+      ? MockNotesRepository(ref.watch(mockDataSourceProvider))
+      : RemoteNotesRepository(api);
+});
 
 class NotesNotifier extends AsyncNotifier<List<SessionNote>> {
   @override

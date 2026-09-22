@@ -1,3 +1,4 @@
+import '../../../core/data/api_client.dart';
 import '../../../core/data/mock_data_source.dart';
 import '../../../core/format/app_date.dart';
 import '../../../core/models/availability_slot.dart';
@@ -50,5 +51,17 @@ class MockSlotRepository implements SlotRepository {
       }
     }
     return slots;
+  }
+}
+
+class RemoteSlotRepository implements SlotRepository {
+  const RemoteSlotRepository(this._api);
+
+  final ApiClient _api;
+
+  @override
+  Future<List<AvailabilitySlot>> fetchSlots() async {
+    final rows = await _api.getList('/api/v1/slots');
+    return rows.map(AvailabilitySlot.fromApi).toList();
   }
 }

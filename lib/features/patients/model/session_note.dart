@@ -38,6 +38,20 @@ class SessionNote {
     );
   }
 
+  factory SessionNote.fromApi(Map<String, dynamic> json) {
+    return SessionNote(
+      id: json['id'] as String,
+      patientId: json['patientId'] as String,
+      note: json['note'] as String,
+      exercises: (json['exercises'] as List<dynamic>).cast<String>(),
+      nextSessionPlan: json['nextSessionPlan'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
   factory SessionNote.fromJson(Map<String, dynamic> json) {
     return SessionNote(
       id: json['id'] as String,

@@ -1,3 +1,4 @@
+import '../../../core/data/api_client.dart';
 import '../../../core/data/mock_data_source.dart';
 import '../../../core/models/therapist_profile.dart';
 
@@ -13,5 +14,16 @@ class MockProfileRepository implements ProfileRepository {
   @override
   Future<TherapistProfile> fetchProfile() async {
     return TherapistProfile.fromJson(await _source.loadObject('profile'));
+  }
+}
+
+class RemoteProfileRepository implements ProfileRepository {
+  const RemoteProfileRepository(this._api);
+
+  final ApiClient _api;
+
+  @override
+  Future<TherapistProfile> fetchProfile() async {
+    return TherapistProfile.fromApi(await _api.getObject('/api/v1/profile'));
   }
 }

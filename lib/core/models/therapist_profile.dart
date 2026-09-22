@@ -33,6 +33,9 @@ class TherapistProfile {
     );
   }
 
+  factory TherapistProfile.fromApi(Map<String, dynamic> json) =>
+      TherapistProfile.fromJson(json);
+
   factory TherapistProfile.fromJson(Map<String, dynamic> json) {
     return TherapistProfile(
       name: json['name'] as String,
